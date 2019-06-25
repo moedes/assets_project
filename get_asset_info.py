@@ -4,6 +4,7 @@ from requests_ntlm import HttpNtlmAuth
 import pandas as pd
 import credential
 import os
+import argparse
 #from datetime import datetime
 #import dateutil.parser
 #from dateutil.parser import parse, relativedelta
@@ -104,9 +105,8 @@ def getAssetInfo_bySite(SiteID):
       labels = ['CS_CUSTOMER_NAME', 'PARTY_NUMBER', 'GLOBAL_DUNS_NUMBER', 'GLOBAL_DUNS_NAME', 'ITEM_SERIAL_NUMBER', 'MODEL_UNIQUE_IDENTIFIER', 'ITEM_INSTALL_DATE', 'MODEL', 'ITEM_DESCRIPTION', 'ITEM_NUM', 'PRODUCT_GROUP', 'PRODUCT_TYPE', 'PRODUCT_FAMILY', 'INSTANCE_PRODUCT_FAMILY', 'INSTALL_BASE_STATUS', 'Instance Description', 'MICROCODE', 'MAINTAINED_BY_GROUP', 'SERVICE_PROVIDER', 'CONNECT_IN_TYPE', 'CONNECT_HOME_TYPE', 'CONNECTED_TO_SN', 'SYR_LAST_DIAL_HOME_DATE', 'SALES_ORDER', 'SALES_ORDER_TYPE', 'CONTRACT_NUMBER', 'COVERAGE_TYPE', 'CONTRACT_SUBLINE_STATUS', 'CONTRACT_SUBLINE_START_DATE', 'CONTRACT_SUBLINE_END_DATE', 'INTERNAL_CUSTOMER', 'PDR', 'SDR', 'IB Solution', 'VCE Support', 'G Code', 'EH SP', 'Address1', 'Address2', 'City', 'State', 'Province', 'Postal Code', 'Time Zone Name', 'DSM_EMAIL', 'DISTRICT', 'PRIMARY_CE_EMAIL', 'ASR_EMAIL', 'CS_ADVOCATE_EMAIL', 'SAM_EMAIL', 'REGION', 'DIVISION', 'THEATER', 'solutionId', 'solutionName']       
       inventory_df = pd.DataFrame(columns=labels)
 
-
-   print(len(inventory_df))
-   siteAssetInfo = inventory_df
+   labels = ['CS_CUSTOMER_NAME', 'PARTY_NUMBER', 'PRODUCT_GROUP','ITEM_SERIAL_NUMBER', 'CONTRACT_SUBLINE_END_DATE','ITEM_INSTALL_DATE','INSTALL_BASE_STATUS', 'CONNECT_IN_TYPE', 'CONNECT_HOME_TYPE', 'SYR_LAST_DIAL_HOME_DATE', 'CONTRACT_SUBLINE_STATUS', 'CONTRACT_SUBLINE_START_DATE','Address1', 'Address2', 'City', 'State', 'Province', 'Postal Code', 'Time Zone Name', 'DSM_EMAIL', 'DISTRICT', 'PRIMARY_CE_EMAIL']
+   siteAssetInfo = inventory_df[labels]
    
    return siteAssetInfo
 
@@ -129,15 +129,7 @@ def getAssetInfo_byDuns(DunsID):
    else:
       labels = ['CS_CUSTOMER_NAME', 'PARTY_NUMBER', 'GLOBAL_DUNS_NUMBER', 'GLOBAL_DUNS_NAME', 'ITEM_SERIAL_NUMBER', 'MODEL_UNIQUE_IDENTIFIER', 'ITEM_INSTALL_DATE', 'MODEL', 'ITEM_DESCRIPTION', 'ITEM_NUM', 'PRODUCT_GROUP', 'PRODUCT_TYPE', 'PRODUCT_FAMILY', 'INSTANCE_PRODUCT_FAMILY', 'INSTALL_BASE_STATUS', 'Instance Description', 'MICROCODE', 'MAINTAINED_BY_GROUP', 'SERVICE_PROVIDER', 'CONNECT_IN_TYPE', 'CONNECT_HOME_TYPE', 'CONNECTED_TO_SN', 'SYR_LAST_DIAL_HOME_DATE', 'SALES_ORDER', 'SALES_ORDER_TYPE', 'CONTRACT_NUMBER', 'COVERAGE_TYPE', 'CONTRACT_SUBLINE_STATUS', 'CONTRACT_SUBLINE_START_DATE', 'CONTRACT_SUBLINE_END_DATE', 'INTERNAL_CUSTOMER', 'PDR', 'SDR', 'IB Solution', 'VCE Support', 'G Code', 'EH SP', 'Address1', 'Address2', 'City', 'State', 'Province', 'Postal Code', 'Time Zone Name', 'DSM_EMAIL', 'DISTRICT', 'PRIMARY_CE_EMAIL', 'ASR_EMAIL', 'CS_ADVOCATE_EMAIL', 'SAM_EMAIL', 'REGION', 'DIVISION', 'THEATER', 'solutionId', 'solutionName']       
       inventory_df = pd.DataFrame(columns=labels)
-      
-           
-   print(len(inventory_df))
-   inventory_df.rename(columns={"CS_CUSTOMER_NAME":"Customer Name","PARTY_NUMBER":"Site ID"}, inplace=True)
-   inventory_df['CONTRACT_SUBLINE_END_DATE'] = pd.to_datetime(inventory_df['CONTRACT_SUBLINE_END_DATE'])
-   inventory_df = inventory_df.sort_values(by=['CONTRACT_SUBLINE_END_DATE','Site ID'])
-   date = datetime(2019,1,1)
-   inventory_df = inventory_df[inventory_df['CONTRACT_SUBLINE_END_DATE'] > date]
-
+   
    dunsAssetInfo = inventory_df
 
    return dunsAssetInfo
@@ -146,13 +138,9 @@ def getAssetInfo_forSites(siteID_List):
        
     for index, siteID in enumerate(siteID_List):
         
-        print('index %s, site id %s' %(index, siteID))
-        
         if index == 0:
-            print(siteID)
             assetBook = getAssetInfo_bySite(siteID)
         else:
-            print(siteID)
             assetBook = pd.concat([assetBook, getAssetInfo_bySite(siteID)], ignore_index=True)  
     
     return assetBook
@@ -162,18 +150,64 @@ def getAssetInfo_forDunsList(dunsID_List):
     for index, dunsID in enumerate(dunsID_List):
         
         if index == 0:
-            print(dunsID)
             assetBook = getAssetInfo_byDuns(dunsID)
         else:
-            print(dunsID)
             assetBook = pd.concat([assetBook, getAssetInfo_byDuns(dunsID)], ignore_index=True)  
     
-    #labels = ['Customer Name', 'Site ID', 'GLOBAL_DUNS_NUMBER', 'GLOBAL_DUNS_NAME', 'ITEM_SERIAL_NUMBER', 'MODEL_UNIQUE_IDENTIFIER', 'ITEM_INSTALL_DATE', 'MODEL', 'ITEM_DESCRIPTION', 'ITEM_NUM', 'PRODUCT_GROUP', 'PRODUCT_TYPE', 'PRODUCT_FAMILY', 'INSTANCE_PRODUCT_FAMILY', 'INSTALL_BASE_STATUS', 'Instance Description', 'MICROCODE', 'MAINTAINED_BY_GROUP', 'SERVICE_PROVIDER', 'CONNECT_IN_TYPE', 'CONNECT_HOME_TYPE', 'CONNECTED_TO_SN', 'SYR_LAST_DIAL_HOME_DATE', 'SALES_ORDER', 'SALES_ORDER_TYPE', 'CONTRACT_NUMBER', 'COVERAGE_TYPE', 'CONTRACT_SUBLINE_STATUS', 'CONTRACT_SUBLINE_START_DATE', 'CONTRACT_SUBLINE_END_DATE', 'INTERNAL_CUSTOMER', 'PDR', 'SDR', 'IB Solution', 'VCE Support', 'G Code', 'EH SP', 'Address1', 'Address2', 'City', 'State', 'Province', 'Postal Code', 'Time Zone Name', 'DSM_EMAIL', 'DISTRICT', 'PRIMARY_CE_EMAIL', 'ASR_EMAIL', 'CS_ADVOCATE_EMAIL', 'SAM_EMAIL', 'REGION', 'DIVISION', 'THEATER', 'solutionId', 'solutionName']
-    labels = ['Customer Name', 'Site ID', 'ITEM_SERIAL_NUMBER',  'ITEM_INSTALL_DATE', 'MODEL', 'ITEM_DESCRIPTION', 'PRODUCT_GROUP', 'INSTANCE_PRODUCT_FAMILY', 'INSTALL_BASE_STATUS', 'CONNECT_IN_TYPE', 'CONNECT_HOME_TYPE', 'SYR_LAST_DIAL_HOME_DATE', 'SALES_ORDER', 'CONTRACT_NUMBER', 'COVERAGE_TYPE', 'CONTRACT_SUBLINE_STATUS', 'CONTRACT_SUBLINE_START_DATE', 'CONTRACT_SUBLINE_END_DATE', 'INTERNAL_CUSTOMER', 'Address1', 'Address2', 'City', 'State', 'Province', 'Postal Code', 'Time Zone Name', 'DSM_EMAIL', 'DISTRICT', 'PRIMARY_CE_EMAIL', 'ASR_EMAIL', 'CS_ADVOCATE_EMAIL', 'SAM_EMAIL', 'REGION', 'DIVISION', 'THEATER', 'solutionId', 'solutionName']
+    labels = ['CS_CUSTOMER_NAME', 'PARTY_NUMBER', 'PRODUCT_GROUP','ITEM_SERIAL_NUMBER', 'CONTRACT_SUBLINE_END_DATE','ITEM_INSTALL_DATE','INSTALL_BASE_STATUS', 'CONNECT_IN_TYPE', 'CONNECT_HOME_TYPE', 'SYR_LAST_DIAL_HOME_DATE', 'CONTRACT_SUBLINE_STATUS', 'CONTRACT_SUBLINE_START_DATE','Address1', 'Address2', 'City', 'State', 'Province', 'Postal Code', 'Time Zone Name', 'DSM_EMAIL', 'DISTRICT', 'PRIMARY_CE_EMAIL']
 
     assetBook = assetBook[labels]
-    
+
     return assetBook
+
+def get_width(assetBook):
+   widthdict = {}
+   key = 0
+   for label in assetBook:
+      strlen = assetBook[label]
+      maxlen = strlen.map(len, na_action='ignore').max()
+      widthdict.update({key:maxlen})
+      key += 1
+   return widthdict
+
+def sortren_book(assetBook):
+   assetBook.rename(columns={"CS_CUSTOMER_NAME":"Customer Name","PARTY_NUMBER":"Site ID","PRODUCT_GROUP":"Product","ITEM_SERIAL_NUMBER":"Serial Number"
+                          , "ITEM_INSTALL_DATE": "Date Installed","CONTRACT_SUBLINE_END_DATE":"Contract End Date",
+                          "INSTALL_BASE_STATUS":"Install Status", "CONNECT_IN_TYPE":"Dial In", "CONNECT_HOME_TYPE":"Dial Home", 
+                          "SYR_LAST_DIAL_HOME_DATE":"Last Dial Home", "CONTRACT_SUBLINE_STATUS":"Contract Status", 
+                          "CONTRACT_SUBLINE_START_DATE":"Contract Start Date", "DSM_EMAIL":"DSM email", 
+                          "DISTRICT":"District", "PRIMARY_CE_EMAIL":"CE Email"}, inplace=True)
+   assetBook['Contract End Date'] = pd.to_datetime(assetBook['Contract End Date'])
+   date = datetime(2019,1,1)
+   assetBook = assetBook[assetBook['Contract End Date'] > date]
+   assetBook = assetBook.sort_values(by=['State','Contract End Date','Site ID'])
+
+   return assetBook
+
+def format_col(workbook, worksheet):
+   formatcell = workbook.add_format({'align':'center'})
+
+   for col, width in col_widths.items():
+      width = width + 10
+      worksheet.set_column(col,col,width, formatcell)
+   
+   return
+
+def format_cells(workbook, worksheet, assetBook):
+   date = datetime(2020,5,31)
+   red = workbook.add_format({'bg_color':'red','num_format': 'mmm d, yyyy'})
+   green = workbook.add_format({'bg_color':'green','num_format': 'mmm d, yyyy'})
+   loc = assetBook.columns.get_loc("Contract End Date")
+   length = len(assetBook)
+   worksheet.conditional_format(1,loc,length,loc, {'type': 'date',
+                                                 'criteria':'greater than',
+                                                 'value': date,
+                                                 'format': green})
+   worksheet.conditional_format(1,loc,length,loc, {'type': 'date',
+                                                 'criteria': 'less than',
+                                                 'value': date,
+                                                 'format': red})
+   return
 
 sn = ''
 if sn != '':
@@ -190,124 +224,46 @@ if sn != '':
    writer.save()
    writer.close()
 
-# Janus
-dunsList = ['024496726','071514534']
-assetBook = getAssetInfo_forDunsList(dunsList)
+parser = argparse.ArgumentParser()
+parser.add_argument("--cust", "-c", help="Valid Customer Input is Janus, Pulte, SCL, or Startek")
+
+args = parser.parse_args()
+if args.cust == "Janus":
+   sites = ['2547453', '14735642','4257799','1003821648','63950','1003830326','1003868624','4285738']
+elif args.cust == "Pulte":
+   sites = ['11739474','28957345']
+elif args.cust == "SCL":
+   sites = ['25992760','1003906813','2919727','14584171','10457835','4408824']
+elif args.cust == "Startek":
+   sites = ['29604482','1003972236']
+else:
+   print("Use Valid Customer")
+
+assetBook = getAssetInfo_forSites(sites)#getAssetInfo_forDunsList(dunsList)
+col_widths = get_width(assetBook)
+assetBook = sortren_book(assetBook)  
+
+#for index, row in snassets.iterrows():
+#   contractEndDate = parse(row['Contract End Date'])
+#   contractEndDateText = contractEndDate.strftime("%B %d, %Y")
+#   contractRemainingTime = relativedelta(contractEndDate, datetime.now())
+#   yearsRemaining = contractRemainingTime.years
+#   monthsRemaining = contractRemainingTime.months
+#   daysRemaining = contractRemainingTime.days
+#   maint_text = 'SN - %s Contract Ends %s %s years and %s months and %s days remaining as of %s' %(row['Serial Number'],contractEndDateText,yearsRemaining,monthsRemaining,daysRemaining,datetime.today().strftime('%m-%d-%y'))
+#   print(maint_text)
+#############################################
+
 savepath = os.path.abspath(r'C:\Users\mozesj\OneDrive - Dell Inc\Documents\Python Projects\DellEMC\Assets\Janus')
-writer = pd.ExcelWriter(os.path.join(savepath, 'Assets - Janus ' + '.xlsx'), engine="xlsxwriter")
-assetBook.to_excel(writer,'asset info')
+writer = pd.ExcelWriter(os.path.join(savepath, 'Assets - ' + args.cust + '.xlsx'), engine="xlsxwriter")
+assetBook.to_excel(writer,'asset info', index=False)
+workbook = writer.book
+worksheet = writer.sheets['asset info']
+
+format_col(workbook, worksheet)
+format_cells(workbook, worksheet, assetBook)
+
 writer.save()
 writer.close()
-
-# State of CO OIT EFORT
-siteID_List = ['13468438', '13563174']
-assetBook = getAssetInfo_forSites(siteID_List)
-savepath = os.path.abspath(r'C:\Users\cohend\Documents')
-writer = pd.ExcelWriter(os.path.join(savepath, 'Assets - OIT EFORT ' + '-'.join(siteID_List) + '.xlsx'))
-assetBook.to_excel(writer,'asset info')
-writer.save()
-writer.close()
-
-# State of CO OIT KIPLING
-siteID_List = ['3672823', '14362892']
-assetBook = getAssetInfo_forSites(siteID_List)
-savepath = os.path.abspath(r'C:\Users\cohend\Documents\projects MDC\State of CO OIT\Asset Info')
-writer = pd.ExcelWriter(os.path.join(savepath, 'Assets - OIT KIPLING ' + '-'.join(siteID_List) + '.xlsx'))
-assetBook.to_excel(writer,'asset info')
-writer.save()
-writer.close()
-
-# UCHealth
-siteID_List = ['4038878', '1003871014']
-assetBook = getAssetInfo_forSites(siteID_List)
-savepath = os.path.abspath(r'C:\Users\cohend\Documents\projects MDC\UCH\Assessments\Asset Info')
-writer = pd.ExcelWriter(os.path.join(savepath, 'Assets - UCHealth ' + '-'.join(siteID_List) + '.xlsx'))
-assetBook.to_excel(writer,'asset info')
-writer.save()
-writer.close()
-
-# DEN - Airport
-siteID_List = ['1003855654','38545', '3939618', '14584553']
-assetBook = getAssetInfo_forSites(siteID_List)
-savepath = os.path.abspath(r'C:\Users\cohend\Documents\projects MDC\DEN\Assessments\Asset Info')
-writer = pd.ExcelWriter(os.path.join(savepath, 'Assets - DEN ' + '-'.join(siteID_List) + '.xlsx'))
-assetBook.to_excel(writer,'asset info')
-writer.save()
-writer.close()
-
-# CCOD
-siteID_List = ['1003925225', '2530711', '2530727', '26349867', '3986941', '663354']
-assetBook = getAssetInfo_forSites(siteID_List)
-savepath = os.path.abspath(r'C:\Users\cohend\Documents\projects MDC\State of CO OIT\Asset Info')
-writer = pd.ExcelWriter(os.path.join(savepath, 'Assets - CCOD ' + '-'.join(siteID_List) + '.xlsx'))
-assetBook.to_excel(writer,'asset info')
-writer.save()
-writer.close()
-
-# Envision
-siteID_List = ['1003876149', '1003877862']
-assetBook = getAssetInfo_forSites(siteID_List)
-savepath = os.path.abspath(r'C:\Users\cohend\Documents\projects MDC\Envision')
-writer = pd.ExcelWriter(os.path.join(savepath, 'Assets - OIT EFORT ' + '-'.join(siteID_List) + '.xlsx'))
-assetBook.to_excel(writer,'asset info')
-writer.save()
-writer.close()
-
-
-# Tarra
-dunsList = ['941950321', '079364201', '072459266', '806345658', '007969868', '129673443', '793965997', '963023408', '132419532', '133898960', '786165220', '071012231', '002494128', '612283101', '063560986', '613447580', '074436841', '807419051', '062406718', '010634392', '177300043', '926941402', '619742203', '030437586', '837563717', '170472414', '017793860', '148247414', '121400063', '102333986', '041465720', '360709336', '033218871', '015302771', '122573988', '963519939', '006865273', '147283340', '127807704', '020115796', '062744495', '075769000', '043220623', '186917969', '007111818', '806345542', '150669716', '079764996', '056836364', '786528901', '808374677', '074457169', '878041102', '002629644', '079152306', '825470342', '086899924', '242388085', '064816847', '058072224', '135694847', '128599482', '063311922', '945580587', '003898285', '050245331']
-assetBook = getAssetInfo_forDunsList(dunsList)
-savepath = os.path.abspath(r'C:\Users\cohend\Documents\work data MDC\Administration\Commercial')
-writer = pd.ExcelWriter(os.path.join(savepath, 'Assets - Tarra Blakstad ' + '.xlsx'))
-assetBook.to_excel(writer,'asset info')
-writer.save()
-writer.close()
-
-# Megan Bergman
-dunsList = ['021192422', '015861677', '128248502', '831003012', '061724450', '174893891', '967189296', '623839003', '001056063', '102564572', '034392183', '010041247', '949301337', '966980773', '054929047', '617191122', '079603419', '174890590', '129106469', '050496447', '063322085', '145461500', '826284879', '650320716', '164570173', '123160249', '126930226', '807035527', '041957988', '179389650', '109067298', '069716736', '932442531', '006680487', '782205611', '956212542', '079128482', '018972739', '080269949', '031903446', '628009052', '055034086', '017290430', '084029057', '122032006', '004272808', '102100518', '102380953', '131274164', '796192243', '800314093']
-assetBook = getAssetInfo_forDunsList(dunsList)
-savepath = os.path.abspath(r'C:\Users\cohend\Documents\work data MDC\Administration\Commercial')
-writer = pd.ExcelWriter(os.path.join(savepath, 'Assets - Megan Bergman 2 ' + '.xlsx'))
-assetBook.to_excel(writer,'asset info')
-writer.save()
-writer.close()
-
-#State of NM
-dunsList = ['007111818']
-assetBook = getAssetInfo_forDunsList(dunsList)
-savepath = os.path.abspath(r'C:\Users\cohend\Documents\work data MDC\Administration\Commercial')
-writer = pd.ExcelWriter(os.path.join(savepath, 'Assets - state of NM ' + '.xlsx'))
-assetBook.to_excel(writer,'asset info')
-writer.save()
-writer.close()
-
-#Pikes Peak Community College
-SideIDList = ['10932273']
-assetBook = getAssetInfo_forSites(SideIDList)
-savepath = os.path.abspath(r'C:\Users\cohend\Documents\projects MDC\pikes peak community college')
-writer = pd.ExcelWriter(os.path.join(savepath, 'Assets - PPCC' + '.xlsx'))
-assetBook.to_excel(writer,'asset info')
-writer.save()
-writer.close()
-
 
 quit()
-
-
-asset_data = getAssetInfo_bySN(sn)
-
-siteInfo_data = getSiteInfo_bySN(sn)
-
-#datetime.strptime(asset_data['CONTRACT_SUBLINE_START_DATE'][0], '%Y-%m-%d %H:%M:%S').strftime("%B %d, %Y")
-contractStartDate = parse(asset_data['CONTRACT_SUBLINE_START_DATE'][0])
-contractStartDateText = contractStartDate.strftime("%B %d, %Y")
-
-contractEndDate = parse(asset_data['CONTRACT_SUBLINE_END_DATE'][0])
-contractEndDateText = contractEndDate.strftime("%B %d, %Y")
-
-contractRemainingTime = relativedelta.relativedelta(contractEndDate, datetime.now())
-
-yearsRemaining = contractRemainingTime.years
-monthsRemaining = contractRemainingTime.months
-
-print('Maintenance Contract\nStarted %s\nEnds %s\n%s years and %s months remaining as of %s' %(contractStartDateText,contractEndDateText,yearsRemaining,monthsRemaining,datetime.today().strftime('%m-%d-%y')))

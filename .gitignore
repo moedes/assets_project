@@ -1,1 +1,5 @@
 credential.py
+*.xlsx
+*.gitignore
+*.pyc
+launch.json

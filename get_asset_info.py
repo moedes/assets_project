@@ -5,6 +5,7 @@ import pandas as pd
 import credential
 import os
 import argparse
+import json
 
 from datetime import datetime
 from dateutil.parser import parse
@@ -87,6 +88,9 @@ def getAssetInfo_bySite(SiteID):
    session = requests.Session()
    session.auth = HttpNtlmAuth(credential.login['username'],credential.login['password'], session)
    r = session.get('http://sitelookup.corp.emc.com/models/getdataTLA.php?fld=Party%20ID&val=' + SiteID)
+   
+   print(json.dumps(r.text, indent=4))
+   
    if int(r.json()["records"]) > 0:
       data = r.json()
       row = 0

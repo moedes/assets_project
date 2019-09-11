@@ -1,16 +1,19 @@
 import requests
 import requests.exceptions
 from requests_ntlm import HttpNtlmAuth
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 import pandas as pd
 import credential
 import os
 import argparse
 import json
+import xlsxwriter
 
 from datetime import datetime
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
 
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 def getSiteID_bySN(sn):
    session = requests.Session()
@@ -241,7 +244,7 @@ if sn != '':
    writer.close()
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--cust", "-c", help="Valid Customer Input is Janus, Pulte, SCL, BCH, Firstbank or Startek")
+parser.add_argument("--cust", "-c", help="Valid Customer Input is Agilent,Janus, Pulte, SCL, BCH, Firstbank or Startek")
 
 args = parser.parse_args()
 if args.cust == "Janus":
@@ -256,6 +259,8 @@ elif args.cust == "BCH":
    sites = ['14308472','5168614','10877767','5159548','1003919844','25838551']
 elif args.cust == "Firstbank":
    sites = ['9120843','9602','2438479','29049084']
+elif args.cust == "Agilent":
+   sites = ['1004230935','4076980','4906201','1003828875','55363','1003831985','1003918035','14650376','3927620','12415254','1003828626','1003828315','3361376','1003828873','2367330','8957317','1003852457','1003828889','1003828292','2386956','1003828051','3654613','2939517','2419636','2419683','5275340','7960716','1003851155','1003855388','1003829005','4050166','81129','2113582','2419219','1003821912','1004541470','18696303','8067058','1003969723']
 else:
    sites = ['2547453', '14735642','4257799','1003821648','63950','1003830326','1003868624','4285738']
    print("Use Valid Customer")
@@ -275,7 +280,7 @@ assetBook = sortren_book(assetBook)
 #   print(maint_text)
 #############################################
 
-savepath = os.path.abspath(r'C:\Users\mozesj\OneDrive - Dell Inc\Documents\Python Projects\DellEMC\Assets\Janus')
+savepath = os.path.abspath(r'C:\Users\mozesj\OneDrive - Dell Technologies\Documents\Python Projects\DellEMC\Assets\Janus')
 writer = pd.ExcelWriter(os.path.join(savepath, 'Assets - ' + args.cust + '.xlsx'), engine="xlsxwriter")
 assetBook.to_excel(writer,'asset info', index=False)
 workbook = writer.book

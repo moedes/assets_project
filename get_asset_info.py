@@ -107,7 +107,7 @@ def getAssetInfo_bySite(SiteID):
       labels = ['CS_CUSTOMER_NAME', 'PARTY_NUMBER', 'GLOBAL_DUNS_NUMBER', 'GLOBAL_DUNS_NAME', 'ITEM_SERIAL_NUMBER', 'MODEL_UNIQUE_IDENTIFIER', 'ITEM_INSTALL_DATE', 'MODEL', 'ITEM_DESCRIPTION', 'ITEM_NUM', 'PRODUCT_GROUP', 'PRODUCT_TYPE', 'PRODUCT_FAMILY', 'INSTANCE_PRODUCT_FAMILY', 'INSTALL_BASE_STATUS', 'Instance Description', 'MICROCODE', 'MAINTAINED_BY_GROUP', 'SERVICE_PROVIDER', 'CONNECT_IN_TYPE', 'CONNECT_HOME_TYPE', 'CONNECTED_TO_SN', 'SYR_LAST_DIAL_HOME_DATE', 'SALES_ORDER', 'SALES_ORDER_TYPE', 'CONTRACT_NUMBER', 'COVERAGE_TYPE', 'CONTRACT_SUBLINE_STATUS', 'CONTRACT_SUBLINE_START_DATE', 'CONTRACT_SUBLINE_END_DATE', 'INTERNAL_CUSTOMER', 'PDR', 'SDR', 'IB Solution', 'VCE Support', 'G Code', 'EH SP', 'Address1', 'Address2', 'City', 'State', 'Province', 'Postal Code', 'Time Zone Name', 'DSM_EMAIL', 'DISTRICT', 'PRIMARY_CE_EMAIL', 'ASR_EMAIL', 'CS_ADVOCATE_EMAIL', 'SAM_EMAIL', 'REGION', 'DIVISION', 'THEATER', 'solutionId', 'solutionName']       
       inventory_df = pd.DataFrame(columns=labels)
 
-   labels = ['CS_CUSTOMER_NAME', 'PARTY_NUMBER', 'PRODUCT_GROUP','ITEM_SERIAL_NUMBER', 'CONTRACT_SUBLINE_END_DATE','ITEM_INSTALL_DATE','INSTALL_BASE_STATUS', 'CONNECT_IN_TYPE', 'CONNECT_HOME_TYPE', 'SYR_LAST_DIAL_HOME_DATE', 'CONTRACT_SUBLINE_STATUS', 'CONTRACT_SUBLINE_START_DATE','Address1', 'Address2', 'City', 'State', 'Province', 'Postal Code', 'Time Zone Name', 'DSM_EMAIL', 'DISTRICT', 'PRIMARY_CE_EMAIL']
+   labels = ['CS_CUSTOMER_NAME', 'PARTY_NUMBER', 'PRODUCT_GROUP','MODEL','ITEM_SERIAL_NUMBER', 'CONTRACT_SUBLINE_END_DATE','ITEM_INSTALL_DATE','INSTALL_BASE_STATUS', 'CONNECT_IN_TYPE', 'CONNECT_HOME_TYPE', 'SYR_LAST_DIAL_HOME_DATE', 'CONTRACT_SUBLINE_STATUS', 'CONTRACT_SUBLINE_START_DATE','Address1', 'Address2', 'City', 'State', 'Province', 'Postal Code', 'Time Zone Name', 'DSM_EMAIL', 'DISTRICT', 'PRIMARY_CE_EMAIL']
    siteAssetInfo = inventory_df[labels]
    
    return siteAssetInfo
@@ -173,7 +173,7 @@ def get_width(assetBook):
    return widthdict
 
 def sortren_book(assetBook):
-   assetBook.rename(columns={"CS_CUSTOMER_NAME":"Customer Name","PARTY_NUMBER":"Site ID","PRODUCT_GROUP":"Product","ITEM_SERIAL_NUMBER":"Serial Number"
+   assetBook.rename(columns={"CS_CUSTOMER_NAME":"Customer Name","PARTY_NUMBER":"Site ID","PRODUCT_GROUP":"Product","MODEL":"Model","ITEM_SERIAL_NUMBER":"Serial Number"
                           , "ITEM_INSTALL_DATE": "Date Installed","CONTRACT_SUBLINE_END_DATE":"Contract End Date",
                           "INSTALL_BASE_STATUS":"Install Status", "CONNECT_IN_TYPE":"Dial In", "CONNECT_HOME_TYPE":"Dial Home", 
                           "SYR_LAST_DIAL_HOME_DATE":"Last Dial Home", "CONTRACT_SUBLINE_STATUS":"Contract Status", 
@@ -244,21 +244,13 @@ if sn != '':
    writer.close()
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--cust", "-c", help="Valid Customer Input is Agilent,Janus, Pulte, SCL, BCH, Firstbank or Startek")
+parser.add_argument("--cust", "-c", help="Valid Customer Input is Agilent, Janus, or SCL")
 
 args = parser.parse_args()
 if args.cust == "Janus":
    sites = ['2547453', '14735642','4257799','1003821648','63950','1003830326','1003868624','4285738']
-elif args.cust == "Pulte":
-   sites = ['11739474','28957345']
 elif args.cust == "SCL":
    sites = ['25992760','1003906813','2919727','14584171','10457835','4408824']
-elif args.cust == "Startek":
-   sites = ['29604482','1003972236']
-elif args.cust == "BCH":
-   sites = ['14308472','5168614','10877767','5159548','1003919844','25838551']
-elif args.cust == "Firstbank":
-   sites = ['9120843','9602','2438479','29049084']
 elif args.cust == "Agilent":
    sites = ['1004230935','4076980','4906201','1003828875','55363','1003831985','1003918035','14650376','3927620','12415254','1003828626','1003828315','3361376','1003828873','2367330','8957317','1003852457','1003828889','1003828292','2386956','1003828051','3654613','2939517','2419636','2419683','5275340','7960716','1003851155','1003855388','1003829005','4050166','81129','2113582','2419219','1003821912','1004541470','18696303','8067058','1003969723']
 else:

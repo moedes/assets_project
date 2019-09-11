@@ -3,3 +3,4 @@ credential.py
 *.gitignore
 *.pyc
 launch.json
+.vscode/settings.json

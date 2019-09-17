@@ -237,7 +237,7 @@ if sn != '':
 
 
    assetBook = getAssetInfo_bySite(siteID)
-   savepath = os.path.abspath(r'C:\Users\mozesj\OneDrive - Dell Inc\Documents\Python Projects\DellEMC\Assets\Janus')
+   savepath = os.path.abspath(r'C:\Users\mozesj\OneDrive - Dell Technologies\Documents\Python Projects\DellEMC\Assets\Janus')
    writer = pd.ExcelWriter(os.path.join(savepath, 'Assets - Site ID ' + siteID + '.xlsx'))
    assetBook.to_excel(writer,'asset info')
    writer.save()
@@ -284,4 +284,4 @@ format_cells(workbook, worksheet, assetBook)
 writer.save()
 writer.close()
 
-quit()
+exit()
